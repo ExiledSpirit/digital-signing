@@ -1,0 +1,50 @@
+<div class="signature-container">
+  <h2>Sign PDF Document</h2>
+
+  <!-- Error Alert -->
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- File Selection -->
+  <div class="form-group">
+    <label for="pdfFile">Select PDF File:</label>
+    <input
+      type="file"
+      id="pdfFile"
+      class="form-control"
+      accept="application/pdf"
+      (change)="onFileSelected($event)"
+      [disabled]="loading"
+    >
+  </div>
+
+  <!-- Certificate Selection -->
+  <div class="form-group">
+    <label for="certificate">Select Certificate:</label>
+    <mat-select
+      id="certificate"
+      class="form-control"
+      [(ngModel)]="selectedCertificate"
+      [disabled]="loading"
+    >
+      <mat-option value="null">Select a certificate...</mat-option>
+      <mat-option
+        *ngFor="let cert of certificates"
+        [value]="cert"
+      >
+        {{ cert.subjectName }}
+      </mat-option>
+    </mat-select>
+  </div>
+
+  <!-- Sign Button -->
+  <button
+    class="btn btn-primary"
+    (click)="signPdf()"
+    [disabled]="!selectedFile || !selectedCertificate || loading"
+  >
+    <span *ngIf="loading" class="spinner-border spinner-border-sm"></span>
+    {{ loading ? 'Signing...' : 'Sign PDF' }}
+  </button>
+</div>
