@@ -64,8 +64,9 @@ export class AppComponent {
    */
   async initializeCertificates() {
     await this.webPkiService.initialize();
-    const certificates = await lastValueFrom(this.webPkiService.getCertificates());
-    this.certificates = certificates.filter(cert => cert.pkiBrazil.cpf || cert.pkiBrazil.cnpj);
+    this.webPkiService.getCertificates().subscribe((certificates) => {
+      this.certificates = certificates.filter(cert => cert.pkiBrazil.cpf || cert.pkiBrazil.cnpj);
+    })
   }
 
   /**
