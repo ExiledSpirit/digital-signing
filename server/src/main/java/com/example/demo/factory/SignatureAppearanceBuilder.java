@@ -80,9 +80,13 @@ public class SignatureAppearanceBuilder {
         int fieldCount = this.getFieldCount();
 
         float pageWidth = document.getPage(page).getCropBox().getWidth();
-        float widthSum = (this.lowerLeftX + (fieldCount + 1) * this.width);
-        float lowerLeftX = Math.max((widthSum % pageWidth) - this.width, this.lowerLeftX);
-        float lowerLeftY = ((float) Math.ceil(pageWidth / widthSum)) * this.lowerLeftY;
+
+        int razao = (int) Math.floor(pageWidth/this.width) ; // ex: W = w * x => 760 = 190 * x => x = 760/190 => x = 4
+
+        int column = fieldCount % razao; // ex: razao = 4 & fieldCount = 9 => column = 1 
+        int row = (int) Math.ceil(fieldCount/razao); // ex: razao = 4 & fieldCount = 9 => row = 3
+        float lowerLeftX = Math.max(this.width * column, this.baseLowerLeftX);
+        float lowerLeftY = Math.max(this.height * row, this.baseLowerLeftY);
         return new Rectangle(lowerLeftX, lowerLeftY, this.width, this.height);
     }
 
