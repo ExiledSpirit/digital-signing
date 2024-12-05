@@ -8,8 +8,7 @@ import type { PreparePdfResponse } from './prepare-pdf-response';
   providedIn: 'root'
 })
 export class SigningService {
-
-  private apiUrl = 'http://localhost:8080/api/signing';
+  private apiUrl = 'http://localhost:4200/api/remote-signing';
 
   constructor(private http: HttpClient) { }
 
@@ -27,7 +26,7 @@ export class SigningService {
     formData.append('certContent', certificateBase64);
     formData.append('certThumb', certificateThumbprint);
 
-    return this.http.post<PreparePdfResponse>(`${this.apiUrl}/start`, formData)
+    return this.http.post<PreparePdfResponse>(`${this.apiUrl}/start`, formData, {withCredentials: true})
       .pipe(
         catchError(this.handleError)
       );
@@ -45,13 +44,10 @@ export class SigningService {
    * @param certificateThumbprint The certificate thumbprint.
    * @returns 
    */
-  complete(preparedPdfBytes: Blob, certificateBase64: string, signedHash: string, certificateThumbprint: string) {
+  complete(signedHash: string) {
     const formData = new FormData();
-    formData.append('preparedPdfBytes', preparedPdfBytes);
-    formData.append('certContent', certificateBase64);
-    formData.append('certThumb', certificateThumbprint);
     formData.append('signedHash', signedHash);
-    return this.http.post(`${this.apiUrl}/complete`, formData, {responseType: 'blob'})
+    return this.http.post(`${this.apiUrl}/complete`, formData, {responseType: 'blob', withCredentials: true})
       .pipe(
         catchError(this.handleError)
       );

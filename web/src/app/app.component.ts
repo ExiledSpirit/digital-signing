@@ -134,8 +134,7 @@ export class AppComponent {
         return;
       }
 
-      const fileBytes = this.convertBase64ToBlob(preparedPdfBytes.preparedPdfBytes);
-      await this.signAndComplete(fileBytes, certificateBase64, preparedPdfBytes.toSignHash);
+      await this.signAndComplete(preparedPdfBytes.toSignHash);
     } catch {
       this.setError('Failed to sign PDF');
     } finally {
@@ -164,9 +163,9 @@ export class AppComponent {
    * @param certificateBase64 Digital certificate as base64 string.
    * @param toSignHash Hash to be signed.
    */
-  async signAndComplete(fileBytes: Blob, certificateBase64: string, toSignHash: string) {
+  async signAndComplete(toSignHash: string) {
     const signature = await this.webPkiService.signHash(toSignHash, this.selectedCertificate!.thumbprint, 'SHA-256');
-    const signedPdfBlob = await lastValueFrom(this.signingService.complete(fileBytes, certificateBase64, signature, this.selectedCertificate!.thumbprint));
+    const signedPdfBlob = await lastValueFrom(this.signingService.complete(signature));
     this.downloadFile(signedPdfBlob, 'signed-document.pdf');
   }
 
