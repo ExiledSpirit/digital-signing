@@ -1,27 +1,30 @@
 // SignatureAppearanceBuilder.java (New Builder Class)
 package com.example.demo.factory;
 
+import java.io.IOException;
 import java.util.Map;
 
 import com.example.demo.signature.SignatureConstraints;
 import com.itextpdf.forms.PdfAcroForm;
 import com.itextpdf.forms.fields.PdfFormField;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.signatures.PdfSignatureAppearance;
 
 public class SignatureAppearanceBuilder {
-    private final float baseLowerLeftX = 100f;
-    private final float baseLowerLeftY = 100f;
+    private final float baseLowerLeftX = 0f;
+    private final float baseLowerLeftY = 0f;
     private final PdfSignatureAppearance appearance;
     private final PdfDocument document;
     private int page = 1;
     private float lowerLeftX = this.baseLowerLeftX;
     private float lowerLeftY = this.baseLowerLeftY;
-    private float width = 150f;
-    private float height = 100f;
-    private String layer2Text = "Signed";
-
+    private float width = 186f;
+    private float height = 47f;
+    private int fontSize = 8;
+    private String layer2Text = "Assinado Digitalmente por\n NOME DO USUÁRIO\n (Emitido pelo CPF 690.XXX.XXX-20)\n Data: 24/09/2024 11:56:28-03:00";
 
     public SignatureAppearanceBuilder(PdfDocument document, PdfSignatureAppearance appearance, boolean lastPage) {
         if (lastPage) this.page = document.getNumberOfPages();
@@ -56,8 +59,20 @@ public class SignatureAppearanceBuilder {
 
     public PdfSignatureAppearance build() {
         Rectangle rect = new Rectangle(lowerLeftX, lowerLeftY, width, height);
+        PdfFont font;
 
-        appearance.setPageRect(rect).setPageNumber(page).setLayer2Text(layer2Text);
+        try {
+            font = PdfFontFactory.createFont("src/main/resources/fonts/Arial.ttf");
+        } catch (IOException e) {
+            font = null;
+        }
+
+        appearance
+            .setPageRect(rect)
+            .setPageNumber(page)
+            .setLayer2Text(layer2Text)
+            .setLayer2FontSize(fontSize)
+            .setLayer2Font(font);
         return appearance;
     }
 

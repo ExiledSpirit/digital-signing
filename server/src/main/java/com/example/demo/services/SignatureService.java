@@ -140,7 +140,10 @@ public class SignatureService {
     private PdfSignatureAppearance createSignatureAppearance(PdfSigner signer) {
         PdfSignatureAppearance appearance = signer.getSignatureAppearance();
         SignatureAppearanceBuilder signatureAppearanceBuilder = new SignatureAppearanceBuilder(signer.getDocument(), appearance, true)
-                .withLayer2Text("Assinatura");
+                .withLayer2Text("Assinado Digitalmente por\n" +
+                                        "NOME DO USUÁRIO\n" +
+                                        "(Emitido pelo CPF 690.XXX.XXX-20)\n" +
+                                        "Data: 24/09/2024 11:56:28-03:00");
 
         signer.setFieldName(signatureAppearanceBuilder.calculateFieldName());
 
