@@ -89,10 +89,10 @@ public class SignatureService {
         ByteArrayOutputStream preparedPdfStream = new ByteArrayOutputStream();
         
         PdfReader reader = new PdfReader(input);
-        PdfSigner signer = new PdfSigner(reader, preparedPdfStream, new StampingProperties());
+        PdfSigner signer = new PdfSigner(reader, preparedPdfStream, new StampingProperties().useAppendMode());
         
         this.createSignatureAppearance(signer);
-        signer.setCertificationLevel(PdfSigner.CERTIFIED_NO_CHANGES_ALLOWED);
+        signer.setCertificationLevel(PdfSigner.NOT_CERTIFIED);
         String fieldName = signer.getFieldName();
         
         // Calculate the hash using DigestCalcBlankSigner
