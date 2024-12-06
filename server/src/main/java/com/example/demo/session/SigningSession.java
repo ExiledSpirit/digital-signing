@@ -1,10 +1,14 @@
 package com.example.demo.session;
 
+import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jdk8.StreamSerializer;
 
 import lombok.Data;
 
@@ -20,7 +24,8 @@ public class SigningSession implements Serializable {
     /**
      * The bytes of the original PDF (before adding any signature container).
      */
-    private byte[] preparedPdfBytes;
+    @JsonSerialize(using=StreamSerializer.class, as=byte[].class)
+     private ByteArrayInputStream preparedPdfBytes;
 
     /**
      * The field name defined in the 1st remote signing step.
@@ -37,7 +42,8 @@ public class SigningSession implements Serializable {
      * Its the bytes generated from pkcs7.getAuthenticatedAttributeBytes.
      * This is currently only being used for debugging purposes.
      */
-    private byte[] toSign;
+    @JsonSerialize(using=StreamSerializer.class, as=byte[].class)
+     private ByteArrayInputStream toSign;
 
     /**
      * Short term for Before Attribute Bytes. Its used to store
@@ -45,5 +51,6 @@ public class SigningSession implements Serializable {
      * created in the 1st remote signing step and used in the complete step
      * to apply the signature to.
      */
-    private byte[] beforeAttr;
+    @JsonSerialize(using=StreamSerializer.class, as=byte[].class)
+     private ByteArrayInputStream beforeAttr;
 }

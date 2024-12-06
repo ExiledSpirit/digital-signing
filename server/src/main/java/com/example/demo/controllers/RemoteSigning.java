@@ -44,10 +44,10 @@ public class RemoteSigning {
     public ResponseEntity<byte[]> complete(@RequestParam String signedHash, HttpSession session)
         throws IOException, GeneralSecurityException {
 
-        byte[] preparedPdfBytes = this.signingSession.getPreparedPdfBytes();
+        byte[] preparedPdfBytes = this.signingSession.getPreparedPdfBytes().readAllBytes();
         String fieldName = this.signingSession.getFieldName();
         String certCont = this.signingSession.getCertContent();
-        byte[] beforeAttrBytes = this.signingSession.getBeforeAttr();
+        byte[] beforeAttrBytes = this.signingSession.getBeforeAttr().readAllBytes();
 
         Assert.notNull(preparedPdfBytes, "Prepared PDF bytes not found in session");
         Assert.notNull(fieldName, "Field name not found in session");
