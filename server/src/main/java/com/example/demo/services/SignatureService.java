@@ -104,11 +104,11 @@ public class SignatureService {
         byte[] toSignHash = this.generateBytesToSign(beforeAttrBytes, certificateChain); // Get the hash
         
         // Store necessary data in the session
-        this.signingSession.setPreparedPdfBytes(new ByteArrayInputStream(preSignedBytes));
+        this.signingSession.setPreparedPdfBytes(preSignedBytes);
         this.signingSession.setFieldName(fieldName);
-        this.signingSession.setToSign(new ByteArrayInputStream(toSignHash));
+        this.signingSession.setToSign(toSignHash);
         this.signingSession.setCertContent(certContent);
-        this.signingSession.setBeforeAttr(new ByteArrayInputStream(beforeAttrBytes));
+        this.signingSession.setBeforeAttr(beforeAttrBytes);
         
         // Return the prepared PDF and the hash to the client
         StartSigningResponse startSigningResponse = new StartSigningResponse();
