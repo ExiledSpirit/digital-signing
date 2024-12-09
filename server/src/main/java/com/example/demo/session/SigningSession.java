@@ -1,6 +1,5 @@
 package com.example.demo.session;
 
-import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 
 import org.springframework.context.annotation.Scope;

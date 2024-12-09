@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.security.GeneralSecurityException;
 import java.security.Security;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -126,7 +125,6 @@ public class SignatureInformationService {
         System.out.println("Signature covers whole document: " + signUtil.signatureCoversWholeDocument(name));
         System.out.println("Document revision: " + signUtil.getRevision(name) + " of " + signUtil.getTotalRevisions());
         System.out.println("Integrity check O? " + pkcs7.verifySignatureIntegrityAndAuthenticity());
-        Certificate[] certChain = pkcs7.getSignCertificateChain();
 
         return pkcs7;
     }

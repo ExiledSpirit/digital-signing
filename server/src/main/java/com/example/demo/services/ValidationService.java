@@ -4,7 +4,6 @@ import com.example.demo.dto.response.ValidationResult;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.security.MessageDigest;
 import java.security.Security;
 import java.security.cert.CertPath;
 import java.security.cert.CertPathBuilder;
@@ -142,8 +141,6 @@ public class ValidationService {
           // Add signer certificate
           certChain.add(converter.getCertificate(signerCert));
 
-          // Add intermediate certificates
-          @SuppressWarnings("unchecked")
           Collection<X509CertificateHolder> certHolders = certificates.getMatches(null);
           for (X509CertificateHolder certHolder : certHolders) {
               if (!certHolder.equals(signerCert)) {

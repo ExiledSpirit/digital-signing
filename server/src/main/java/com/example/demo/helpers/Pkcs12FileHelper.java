@@ -26,7 +26,6 @@ public final class Pkcs12FileHelper {
         return getKeyStoreDetails(p12FileName, ksPass, keyPass, false);
     }
 
-
     private static <T> T getKeyStoreDetails(String p12FileName, char[] ksPass, char[] keyPass, boolean isChain) throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
         T result = null;
 
