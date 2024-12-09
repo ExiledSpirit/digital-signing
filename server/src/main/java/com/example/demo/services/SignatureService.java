@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.response.StartSigningResponse;
 import com.example.demo.factory.SignatureAppearanceBuilder;
+import com.example.demo.factory.SignatureAppearanceBuilder.StampType;
 import com.example.demo.helpers.Pkcs12FileHelper;
 import com.example.demo.session.SigningSession;
 import com.example.demo.signature.Pkcs7Signer;
@@ -140,10 +141,11 @@ public class SignatureService {
     private PdfSignatureAppearance createSignatureAppearance(PdfSigner signer) {
         PdfSignatureAppearance appearance = signer.getSignatureAppearance();
         SignatureAppearanceBuilder signatureAppearanceBuilder = new SignatureAppearanceBuilder(signer.getDocument(), appearance, true)
-                .withLayer2Text("Assinado Digitalmente por\n" +
+                .withText("Assinado Digitalmente por\n" +
                                         "NOME DO USUÁRIO\n" +
                                         "(Emitido pelo CPF 690.XXX.XXX-20)\n" +
-                                        "Data: 24/09/2024 11:56:28-03:00");
+                                        "Data: 24/09/2024 11:56:28-03:00")
+                .withStamp(StampType.ICP);
 
         signer.setFieldName(signatureAppearanceBuilder.calculateFieldName());
 
