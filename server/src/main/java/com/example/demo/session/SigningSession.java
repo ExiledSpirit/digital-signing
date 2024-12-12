@@ -20,7 +20,7 @@ public class SigningSession implements Serializable {
     /**
      * The bytes of the original PDF (before adding any signature container).
      */
-    private byte[] preparedPdfBytes;
+     private byte[] preparedPdfBytes;
 
     /**
      * The field name defined in the 1st remote signing step.
@@ -37,7 +37,7 @@ public class SigningSession implements Serializable {
      * Its the bytes generated from pkcs7.getAuthenticatedAttributeBytes.
      * This is currently only being used for debugging purposes.
      */
-    private byte[] toSign;
+     private byte[] toSign;
 
     /**
      * Short term for Before Attribute Bytes. Its used to store
@@ -45,5 +45,5 @@ public class SigningSession implements Serializable {
      * created in the 1st remote signing step and used in the complete step
      * to apply the signature to.
      */
-    private byte[] beforeAttr;
+     private byte[] beforeAttr;
 }

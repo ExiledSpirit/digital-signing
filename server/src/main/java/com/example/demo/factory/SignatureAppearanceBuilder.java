@@ -4,13 +4,23 @@ package com.example.demo.factory;
 import java.io.IOException;
 import java.util.Map;
 
+import org.springframework.core.io.ClassPathResource;
+
 import com.example.demo.signature.SignatureConstraints;
 import com.itextpdf.forms.PdfAcroForm;
 import com.itextpdf.forms.fields.PdfFormField;
+import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.xobject.PdfFormXObject;
+import com.itextpdf.kernel.pdf.xobject.PdfImageXObject;
+import com.itextpdf.layout.Canvas;
+import com.itextpdf.layout.element.Div;
+import com.itextpdf.layout.element.Image;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.signatures.PdfSignatureAppearance;
 
 public class SignatureAppearanceBuilder {
@@ -24,7 +34,8 @@ public class SignatureAppearanceBuilder {
     private float width = 186f;
     private float height = 47f;
     private int fontSize = 8;
-    private String layer2Text = "Assinado Digitalmente por\n NOME DO USUÁRIO\n (Emitido pelo CPF 690.XXX.XXX-20)\n Data: 24/09/2024 11:56:28-03:00";
+    private String text = "Assinado Digitalmente por\n NOME DO USUÁRIO\n (Emitido pelo CPF 690.XXX.XXX-20)\n Data: 24/09/2024 11:56:28-03:00";
+    private StampType stampType = StampType.ICP;
 
     public SignatureAppearanceBuilder(PdfDocument document, PdfSignatureAppearance appearance, boolean lastPage) {
         if (lastPage) this.page = document.getNumberOfPages();
@@ -52,27 +63,69 @@ public class SignatureAppearanceBuilder {
         return this;
     }
 
-    public SignatureAppearanceBuilder withLayer2Text(String layer2Text) {
-        this.layer2Text = layer2Text;
+    public SignatureAppearanceBuilder withText(String text) {
+        this.text = text;
+        return this;
+    }
+
+    public SignatureAppearanceBuilder withStamp(StampType stampType) {
+        this.stampType = stampType;
         return this;
     }
 
     public PdfSignatureAppearance build() {
         Rectangle rect = new Rectangle(lowerLeftX, lowerLeftY, width, height);
+        int fontSize = this.fontSize;
         PdfFont font;
 
         try {
-            font = PdfFontFactory.createFont("src/main/resources/fonts/Arial.ttf");
+            font = PdfFontFactory.createFont("fonts/Arial.ttf");
         } catch (IOException e) {
             font = null;
         }
 
         appearance
             .setPageRect(rect)
-            .setPageNumber(page)
-            .setLayer2Text(layer2Text)
-            .setLayer2FontSize(fontSize)
-            .setLayer2Font(font);
+            .setPageNumber(page);
+
+        PdfFormXObject layer2XObject = this.appearance.getLayer2();
+
+        try {
+            Image stamp = this.fetchStamp();
+            PdfFormXObject container = new PdfFormXObject(new Rectangle(rect.getWidth(), rect.getHeight()));
+
+            // Create paragraph.
+            Paragraph paragraph = new Paragraph(this.text)
+                    .setMargin(0)
+                    .setPadding(0)
+                    .setFont(font)
+                    .setFontSize(fontSize)
+                    .setTextAlignment(TextAlignment.LEFT);
+
+
+            // Calculate dimensions and positions of stamp
+            float stampWidth = 40f; // Adjust as needed
+            float availableTextWidth = rect.getWidth() - stampWidth - 5f;
+
+            float stampHeight = stamp.getImageScaledHeight() * stampWidth / stamp.getImageScaledWidth(); // Maintain aspect ratio
+            float stampX = container.getWidth() - stampWidth - 5f;
+            float stampY = (container.getHeight() - stampHeight) / 2;
+
+            // Set fixed dimensions for the stamp
+            stamp.scaleToFit(stampWidth, stampHeight);
+            stamp.setFixedPosition(stampX, stampY);
+
+            // Create div and assign text and stamp to it.
+            Div div = new Div();
+            div.add(paragraph.setWidth(availableTextWidth)).add(stamp);
+
+            // Add div containing text and stamp to the canvas
+            Canvas canvas = new Canvas(layer2XObject, document);
+            canvas.add(div);
+            canvas.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return appearance;
     }
 
@@ -101,5 +154,17 @@ public class SignatureAppearanceBuilder {
 
     public String calculateFieldName() {
         return SignatureConstraints.FIELD_NAME + this.getFieldCount();
+    }
+
+    private Image fetchStamp() throws IOException {
+        ClassPathResource logoResource = new ClassPathResource(this.stampType.equals(StampType.Logo) ? "images/logo.png" : "images/icpbrasil.jpg");
+        byte[] logoBytes = logoResource.getInputStream().readAllBytes();
+        PdfImageXObject logoImageXObject = new PdfImageXObject(ImageDataFactory.create(logoBytes));
+        return new Image(logoImageXObject);
+    }
+
+    public static enum StampType {
+        ICP,
+        Logo;
     }
 }
