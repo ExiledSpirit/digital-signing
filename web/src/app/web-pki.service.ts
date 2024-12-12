@@ -3,7 +3,7 @@ import { LacunaWebPKI, CertificateModel } from 'web-pki';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class WebPkiService {
   /**
@@ -15,14 +15,14 @@ export class WebPkiService {
    * Certificate list.
    */
   private certificatesSubject = new BehaviorSubject<CertificateModel[]>([]);
-  
+
   constructor() {
     this.pki = new LacunaWebPKI();
   }
 
   /**
    * Returns the certificate list subject as observable.
-   * @returns 
+   * @returns
    */
   getCertificates(): Observable<CertificateModel[]> {
     return this.certificatesSubject.asObservable();
@@ -34,11 +34,13 @@ export class WebPkiService {
    */
   async initialize(): Promise<void> {
     try {
-      this.pki.init(({ready: () => {
-        this.pki.listCertificates().success((certificates) => {
-          this.certificatesSubject.next(certificates);
-        })
-      }}));
+      this.pki.init({
+        ready: () => {
+          this.pki.listCertificates().success((certificates) => {
+            this.certificatesSubject.next(certificates);
+          });
+        },
+      });
     } catch (error) {
       console.error('Error initializing WebPKI:', error);
       throw error;
@@ -57,16 +59,19 @@ export class WebPkiService {
    */
   signHash(hash: string, thumbprint: string, hashAlgorithm: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      this.pki.signData({
-        thumbprint,
-        data: hash,
-        digestAlgorithm: hashAlgorithm,
-      }).success(signature => {
-        resolve(signature);
-      }).fail(error => {
-        console.error('Error signing hash:', error);
-        reject(error);
-      });
+      this.pki
+        .signData({
+          thumbprint,
+          data: hash,
+          digestAlgorithm: hashAlgorithm,
+        })
+        .success((signature) => {
+          resolve(signature);
+        })
+        .fail((error) => {
+          console.error('Error signing hash:', error);
+          reject(error);
+        });
     });
   }
 
@@ -76,11 +81,12 @@ export class WebPkiService {
    */
   readCertificate(thumbprint: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      this.pki.readCertificate({
-        thumbprint
-      })
+      this.pki
+        .readCertificate({
+          thumbprint,
+        })
         .success((content) => resolve(content))
-        .fail((error) => reject(error))
-    })
+        .fail((error) => reject(error));
+    });
   }
 }

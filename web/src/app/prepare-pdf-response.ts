@@ -1,4 +1,4 @@
 export interface PreparePdfResponse {
-  preparedPdfBytes: string,
-  toSignHash: string
+  preparedPdfBytes: string;
+  toSignHash: string;
 }

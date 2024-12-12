@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { WebPkiService } from './web-pki.service';
 import { SigningService } from './signing.service';
 import { CertificateModel } from 'web-pki';
@@ -7,15 +7,16 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { lastValueFrom } from 'rxjs';
 import { MatSelectModule } from '@angular/material/select';
+import type { FileEventTarget } from './types/global';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [MatInputModule, ReactiveFormsModule, FormsModule, CommonModule, MatSelectModule],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   /**
    * Available user certificates.
    */
@@ -30,7 +31,7 @@ export class AppComponent {
    * Selected file.
    */
   selectedFile: File | null = null;
-  
+
   /**
    * Base64 string of the selected file.
    */
@@ -48,7 +49,7 @@ export class AppComponent {
 
   constructor(
     private webPkiService: WebPkiService,
-    private signingService: SigningService
+    private signingService: SigningService,
   ) {}
 
   async ngOnInit() {
@@ -65,8 +66,8 @@ export class AppComponent {
   async initializeCertificates() {
     await this.webPkiService.initialize();
     this.webPkiService.getCertificates().subscribe((certificates) => {
-      this.certificates = certificates.filter(cert => cert.pkiBrazil.cpf || cert.pkiBrazil.cnpj);
-    })
+      this.certificates = certificates.filter((cert) => cert.pkiBrazil.cpf || cert.pkiBrazil.cnpj);
+    });
   }
 
   /**
@@ -74,8 +75,10 @@ export class AppComponent {
    *
    * @param event
    */
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
+  onFileSelected(event: Event) {
+    if (!event || !event.target) return;
+    const fileTarget: FileEventTarget = event.target as FileEventTarget;
+    const file = fileTarget.files[0];
     if (this.isValidPdf(file)) {
       this.selectedFile = file;
       this.convertFileToBase64(file);
@@ -88,8 +91,8 @@ export class AppComponent {
   /**
    * Returns if given file is a valid PDF.
    *
-   * @param file 
-   * @returns 
+   * @param file
+   * @returns
    */
   isValidPdf(file: File): boolean {
     return file && file.type === 'application/pdf';
@@ -98,8 +101,8 @@ export class AppComponent {
   /**
    * Convert file to base64 string.
    *
-   * @param file 
-   * @param callback 
+   * @param file
+   * @param callback
    */
   convertFileToBase64(file: Blob, callback?: (base64: string) => void) {
     const reader = new FileReader();
@@ -149,8 +152,8 @@ export class AppComponent {
   /**
    * Prepares PDF server-side. Adds a signature field.
    *
-   * @param certificateBase64 
-   * @returns 
+   * @param certificateBase64
+   * @returns
    */
   async preparePdf(certificateBase64: string) {
     return lastValueFrom(this.signingService.start(this.selectedFile!, certificateBase64, this.selectedCertificate!.thumbprint));
@@ -173,7 +176,7 @@ export class AppComponent {
    * Converts base64 string to Blob.
    *
    * @param base64
-   * @returns 
+   * @returns
    */
   convertBase64ToBlob(base64: string): Blob {
     const binaryData = atob(base64);
@@ -187,8 +190,8 @@ export class AppComponent {
   /**
    * Download blob as file.
    *
-   * @param blob 
-   * @param filename 
+   * @param blob
+   * @param filename
    */
   downloadFile(blob: Blob, filename: string) {
     const url = window.URL.createObjectURL(blob);
