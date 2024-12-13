@@ -8,11 +8,13 @@ import { CommonModule } from '@angular/common';
 import { lastValueFrom } from 'rxjs';
 import { MatSelectModule } from '@angular/material/select';
 import type { FileEventTarget } from './types/global';
+import { FileDragNDropDirective } from './directives/file-drag-n-drop.directive';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [MatInputModule, ReactiveFormsModule, FormsModule, CommonModule, MatSelectModule],
+  imports: [MatInputModule, ReactiveFormsModule, FormsModule, CommonModule, MatSelectModule, FileDragNDropDirective],
+  providers: [FileDragNDropDirective],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
